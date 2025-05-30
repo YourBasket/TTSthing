@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Voice to TTS</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    #output {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #333;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Voice to Text-to-Speech</h1>
+  <button id="start-btn">Start Talking</button>
+  <p id="output">Click "Start Talking" and speak.</p>
+
+  <script>
+    const startBtn = document.getElementById('start-btn');
+    const output = document.getElementById('output');
+
+    // Check for browser support
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const synth = window.speechSynthesis;
+
+    if (!SpeechRecognition || !synth) {
+      output.textContent = "Sorry, your browser does not support Web Speech API.";
+      startBtn.disabled = true;
+    } else {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      startBtn.addEventListener('click', () => {
+        output.textContent = "Listening...";
+        recognition.start();
+      });
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        output.textContent = `You said: "${transcript}"`;
+        
+        const utterance = new SpeechSynthesisUtterance(transcript);
+        synth.speak(utterance);
+      };
+
+      recognition.onerror = (event) => {
+        output.textContent = `Error: ${event.error}`;
+      };
+    }
+  </script>
+</body>
+</html>
